@@ -43,37 +43,43 @@ class TimeoutHandler:
 def sign(x): return -1 if x < 0 else 1
 
 
-def cost(T, model):
+def cost(T, model, coefficients):
     r = 0
     for l in T:
-        if model[l] > 0:
-            r += 1
+        if model[l - 1] > 0:
+            r += coefficients[l - 1]
     return r
 
 
 def solve(model, T, best):
+    best_copy = copy.copy(best)
     final_result = None
     assumptions = []
     for i in range(len(T)):
-        # TODO: If max, then > 0
-        if best[T[i] - 1] < 0:
-            assumptions.append(T[i])
+        # TODO: If max, then > 0?
+        if best_copy[T[i] - 1] < 0:
+            assumptions.append(-T[i])
         else:
             tmp_assumptions = copy.copy(assumptions)
             tmp_assumptions.append(-T[i])
             model.solve(tmp_assumptions, 0)
             final_result = model.getResult()
+            best_copy = final_result[1]
             if final_result[2] == 2:
                 assumptions.append(T[i])
             else:
                 assumptions = tmp_assumptions
-    return final_result[1]
+
+    if final_result is not None and final_result[2] == 2:
+        return best
+
+    return best_copy
 
 
 K = 1000
 
 
-def solve_inc(model, T):
+def solve_inc(model, T, C, debug=False):
     model.solve([], 0)
     result = model.getResult()
 
@@ -84,9 +90,10 @@ def solve_inc(model, T):
 
     for _ in range(K):
         tmp_best = solve(model, T, best)
-        # print("cost(T, tmp_best)", cost(T, tmp_best),
-        #      ", cost(T, best)", cost(T, best))
-        if cost(T, tmp_best) < cost(T, best):
+        if debug:
+            print("cost(T, tmp_best)", cost(T, tmp_best, C),
+                  ", cost(T, best)", cost(T, best, C))
+        if cost(T, tmp_best, C) < cost(T, best, C):
             best = copy.copy(tmp_best)
         random.shuffle(T)
         # model.clearLearnedConstraints()  # Is this wanted?
@@ -206,7 +213,8 @@ if __name__ == "__main__":
         constraints[idx] = (c[0], c[1])
 
     rsat.print()
-    result = solve_inc(rsat, objvars)
+    result = solve_inc(rsat, objvars, objcoefs)
+    print(result)
 
     # rsat.print()
     #rsat.solve([], 0)
