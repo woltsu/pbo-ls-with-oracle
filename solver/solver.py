@@ -6,6 +6,7 @@ import roundingsat
 import argparse
 import random
 import copy
+from numpy.random import choice
 
 start = 0
 total_hs_time = 0
@@ -43,67 +44,125 @@ class TimeoutHandler:
 def sign(x): return -1 if x < 0 else 1
 
 
-def cost(T, model, coefficients):
+def weighted_shuffle(arr, weights):
+    return list(choice(a=arr, p=weights, replace=False, size=len(arr)))
+
+
+def cost(T, model, C_map):
     r = 0
     for l in T:
         if model[l - 1] > 0:
-            r += coefficients[l - 1]
+            r += C_map[l]
     return r
 
 
-def solve(model, T, best):
+# TODO: Handle max instances other way around?
+def is_good(c, x):
+    if c < 0 and x > 0:
+        return False
+    elif c < 0 and x < 0:
+        return True
+    elif c > 0 and x < 0:
+        return True
+    elif c > 0 and x > 0:
+        return False
+
+
+def is_sat(result):
+    return result[2] == 1
+
+
+# We want to have "good" literals in front and "bad" literals at back
+def calculate_weights(T, C_map):
+    weights = [0] * len(T)
+    for (i, l) in enumerate(T):
+        weights[i] = 1 / C_map[l]
+
+    # Normalize weights
+    total_weights = 0
+    for w in weights:
+        total_weights += w
+
+    for (i, w) in enumerate(weights):
+        weights[i] = w / total_weights
+
+    return weights
+
+
+def split_to_good_and_bad(T, C_map, model):
+    good = []
+    bad = []
+    for l in T:
+        l_idx = l - 1
+        if is_good(C_map[l], model[l_idx]):
+            good.append(l)
+        else:
+            bad.append(l)
+    return [good, bad]
+
+
+def solve(model, T, C_map, best):
     best_copy = copy.copy(best)
     final_result = None
     assumptions = []
+
     for i in range(len(T)):
-        # TODO: If max, then > 0?
-        if best_copy[T[i] - 1] < 0:
-            assumptions.append(-T[i])
+        l = T[i]
+        l_idx = l - 1
+
+        if is_good(C_map[l], best_copy[l_idx]):
+            assumptions.append(best_copy[l_idx])
         else:
             tmp_assumptions = copy.copy(assumptions)
-            tmp_assumptions.append(-T[i])
+            tmp_assumptions.append(-best_copy[l_idx])
             model.solve(tmp_assumptions, 0)
             final_result = model.getResult()
-            best_copy = final_result[1]
-            if final_result[2] == 2:
-                assumptions.append(T[i])
+
+            if not is_sat(final_result):
+                assumptions.append(best_copy[l_idx])
             else:
+                best_copy = final_result[1]
+                (good, bad) = split_to_good_and_bad(T[i+1:], C_map, best_copy)
+                T = T[:i+1] + good + bad
                 assumptions = tmp_assumptions
 
-    if final_result is not None and final_result[2] == 2:
+    if final_result is not None and not is_sat(final_result):
         return best
 
     return best_copy
 
 
-K = 1000
+# TODO: Change to time limit
+K = 2500
 
 
-def solve_inc(model, T, C, debug=False):
+def solve_inc(model, T, C_map, debug=True):
     model.solve([], 0)
     result = model.getResult()
+    weights = calculate_weights(T, C_map)
+    T_copy = copy.copy(T)
 
-    if result[2] == 2:
+    if not is_sat(result):
         return "UNSAT"
 
     best = copy.copy(result[1])
 
     for _ in range(K):
-        tmp_best = solve(model, T, best)
+        shuffled_T = weighted_shuffle(T_copy, weights)
+        tmp_best = solve(model, shuffled_T, C_map, best)
         if debug:
-            print("cost(T, tmp_best)", cost(T, tmp_best, C),
-                  ", cost(T, best)", cost(T, best, C))
-        if cost(T, tmp_best, C) < cost(T, best, C):
+            print("cost(T, tmp_best)", cost(T, tmp_best, C_map),
+                  ", cost(T, best)", cost(T, best, C_map))
+        if cost(T, tmp_best, C_map) < cost(T, best, C_map):
             best = copy.copy(tmp_best)
-        random.shuffle(T)
-        # model.clearLearnedConstraints()  # Is this wanted?
 
     return best
 
 
+# TODO: Max to min -> flip coefficents (* -1) and then flipbits. Deflip result.
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='PBO-#ihs solver', formatter_class=argparse.RawTextHelpFormatter)
+        description='PBO-#oracle solver', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('instance', help='instance file name')
     args = parser.parse_args()
 
@@ -180,7 +239,6 @@ if __name__ == "__main__":
     #
     objectiveline = objectiveline[4:-2].strip().split()
 
-    # LOOPPAA NÄIDEN YLI
     objvars = [int(t[1:]) for t in objectiveline[1::2]]
     objcoefs = list(map(int, objectiveline[0::2]))
     negative_coeffs = []
@@ -212,11 +270,18 @@ if __name__ == "__main__":
         rsat.addConstraint(c[0], c[1])
         constraints[idx] = (c[0], c[1])
 
-    rsat.print()
-    result = solve_inc(rsat, objvars, objcoefs)
-    print(result)
+    # rsat.print()
+    C_map = {}
+    for i in range(len(objvars)):
+        C_map[objvars[i]] = objcoefs[i]
+
+    result = solve_inc(rsat, objvars, C_map, debug=True)
+    print("RESULT:", cost(objvars, result, C_map))
+    # print(result)
+    # TODO: Print cost / calculate cost
+    # TODO: Exclude non variables from result
 
     # rsat.print()
-    #rsat.solve([], 0)
-    #result = rsat.getResult()
+    # rsat.solve([], 0)
+    # result = rsat.getResult()
     # print(result)
