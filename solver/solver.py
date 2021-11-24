@@ -3,6 +3,8 @@ import signal
 import roundingsat
 import argparse
 import copy
+import random
+import numpy as np
 from solver_util import weighted_shuffle, cost, is_good, is_sat, calculate_weights, split_to_good_and_bad, load_input
 
 
@@ -11,6 +13,8 @@ best_model = []
 T = []
 C_map = {}
 betterments = 0
+verbose = False
+baseline = False
 
 
 # Outputs result after given timeout
@@ -27,7 +31,16 @@ class TimeoutHandler:
         self.log_exit()
 
 
+def log(*args):
+    global verbose
+
+    if verbose:
+        print(*args)
+
+
 def solve(model, T, C_map, best):
+    global baseline
+
     best_copy = copy.copy(best)
     final_result = None
     assumptions = []
@@ -49,9 +62,12 @@ def solve(model, T, C_map, best):
             if is_sat(tmp_result):
                 best_copy = tmp_result[1]
 
-                # Move good literals to front for skipping
-                (good, bad) = split_to_good_and_bad(T[i+1:], C_map, best_copy)
-                T = T[:i+1] + good + bad
+                if not baseline:
+                    # Move good literals to front for skipping
+                    # TODO: Maybe test other way around (bad on front)
+                    (good, bad) = split_to_good_and_bad(
+                        T[i+1:], C_map, best_copy)
+                    T = T[:i+1] + good + bad
 
                 assumptions = tmp_assumptions
                 final_result = copy.copy(tmp_result)
@@ -67,6 +83,8 @@ def solve(model, T, C_map, best):
 def solve_inc(model, T, C_map):
     global best_model
     global betterments
+    global verbose
+    global baseline
 
     model.solve([], 0)
     result = model.getResult()
@@ -79,10 +97,16 @@ def solve_inc(model, T, C_map):
     best_model = copy.copy(result[1])
 
     while True and not TimeoutHandler.SIGINT:
-        shuffled_T = weighted_shuffle(T, weights)
+        r = np.random.random(1)[0]
+        if r < 0.05 or baseline:
+            shuffled_T = random.sample(T, len(T))
+        else:
+            shuffled_T = weighted_shuffle(T, weights)
+
         tmp_best = solve(model, shuffled_T, C_map, best_model)
 
         if cost(T, tmp_best, C_map) < cost(T, best_model, C_map):
+            log("betterment:", cost(T, best_model, C_map))
             betterments += 1
             best_model = tmp_best
 
@@ -90,12 +114,21 @@ def solve_inc(model, T, C_map):
 
 
 if __name__ == "__main__":
+    # Seed the random generator
+    # TODO: In the future, test with different seed values and see whether it affects the results
+    random.seed(0)
+    np.random.seed(0)
+
     # Load arguments
     parser = argparse.ArgumentParser(
         description='PBO-#oracle solver', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('instance', help='instance file name')
     parser.add_argument('--timeout', type=int, default=60,
                         help='Timeout after given seconds')
+    parser.add_argument('--verbose', action='store_true',
+                        help='Print debug info')
+    parser.add_argument('--baseline', action='store_true',
+                        help='No semantics')
     args = parser.parse_args()
 
     print("c PBO-#ihs")
@@ -106,6 +139,8 @@ if __name__ == "__main__":
     print("c ---------------------------------\n")
 
     in_file = args.instance
+    verbose = args.verbose
+    baseline = args.baseline
     timeout = args.timeout
 
     # Init timeout hanlder

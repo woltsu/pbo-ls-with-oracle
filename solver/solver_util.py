@@ -29,11 +29,12 @@ def is_sat(result):
     return result[2] == 1
 
 
-# We want to have "good" literals in front and "bad" literals at back
+# Put the literals with the heaviest weights to the front
+# TODO: Maybe test other way around
 def calculate_weights(T, C_map):
     weights = [0] * len(T)
     for (i, l) in enumerate(T):
-        weights[i] = 1 / C_map[l]
+        weights[i] = abs(C_map[l])
 
     # Normalize weights
     total_weights = 0
