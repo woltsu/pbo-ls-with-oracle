@@ -116,8 +116,8 @@ def solve_inc(model, T, C_map):
 if __name__ == "__main__":
     # Seed the random generator
     # TODO: In the future, test with different seed values and see whether it affects the results
-    random.seed(0)
-    np.random.seed(0)
+    random.seed(42)
+    np.random.seed(42)
 
     # Load arguments
     parser = argparse.ArgumentParser(
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     parser.add_argument('--verbose', action='store_true',
                         help='Print debug info')
     parser.add_argument('--baseline', action='store_true',
-                        help='No semantics')
+                        help='Run without any semantics')
     args = parser.parse_args()
 
     print("c PBO-#ihs")
