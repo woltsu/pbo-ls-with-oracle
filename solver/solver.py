@@ -1,41 +1,38 @@
 import sys
 import signal
 import roundingsat
-import argparse
 import copy
 import random
 import numpy as np
-from solver_util import weighted_shuffle, cost, is_good, is_sat, calculate_weights, split_to_good_and_bad, load_input
+from solver_util import weighted_shuffle, cost, is_good, is_sat, calculate_weights, split_to_good_and_bad, load_input, load_args, init_timer
 
 
 # Global variables
+SEED = 42
 best_model = []
 T = []
 C_map = {}
 betterments = 0
 verbose = False
 baseline = False
+timer = None
 
 
 # Outputs result after given timeout
 class TimeoutHandler:
     SIGINT = False
 
-    def log_exit(self):
-        print("cost:", cost(T, best_model, C_map))
-        print("betterments:", betterments)
+    def handle_exit(self, signo, frame):
+        timer(cost(T, best_model, C_map))
+        self.SIGINT = True
         sys.exit()
 
-    def __call__(self, signo, frame):
-        self.SIGINT = True
-        self.log_exit()
-
-
-def log(*args):
-    global verbose
-
-    if verbose:
-        print(*args)
+    def init(self, timeout):
+        signal.signal(signal.SIGINT, self.handle_exit)
+        signal.signal(signal.SIGTERM, self.handle_exit)
+        signal.signal(signal.SIGXCPU, self.handle_exit)
+        signal.signal(signal.SIGALRM, self.handle_exit)
+        signal.alarm(timeout)
 
 
 def solve(model, T, C_map, best):
@@ -95,6 +92,10 @@ def solve_inc(model, T, C_map):
         exit(1)
 
     best_model = copy.copy(result[1])
+    best_cost = cost(T, best_model, C_map)
+
+    if verbose:
+        timer(best_cost)
 
     while True and not TimeoutHandler.SIGINT:
         r = np.random.random(1)[0]
@@ -104,11 +105,14 @@ def solve_inc(model, T, C_map):
             shuffled_T = weighted_shuffle(T, weights)
 
         tmp_best = solve(model, shuffled_T, C_map, best_model)
+        tmp_cost = cost(T, tmp_best, C_map)
 
-        if cost(T, tmp_best, C_map) < cost(T, best_model, C_map):
-            log("betterment:", cost(T, best_model, C_map))
+        if tmp_cost < best_cost:
+            if verbose:
+                timer(tmp_cost)
             betterments += 1
             best_model = tmp_best
+            best_cost = tmp_cost
 
     return best_model
 
@@ -116,39 +120,18 @@ def solve_inc(model, T, C_map):
 if __name__ == "__main__":
     # Seed the random generator
     # TODO: In the future, test with different seed values and see whether it affects the results
-    random.seed(42)
-    np.random.seed(42)
+    random.seed(SEED)
+    np.random.seed(SEED)
 
     # Load arguments
-    parser = argparse.ArgumentParser(
-        description='PBO-#oracle solver', formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('instance', help='instance file name')
-    parser.add_argument('--timeout', type=int, default=60,
-                        help='Timeout after given seconds')
-    parser.add_argument('--verbose', action='store_true',
-                        help='Print debug info')
-    parser.add_argument('--baseline', action='store_true',
-                        help='Run without any semantics')
-    args = parser.parse_args()
-
-    print("c PBO-#ihs")
-    for k, v in args.__dict__.items():
-        if k in ["instance"]:
-            continue
-        print("c {}: {}".format(k, v))
-    print("c ---------------------------------\n")
-
-    in_file = args.instance
-    verbose = args.verbose
-    baseline = args.baseline
-    timeout = args.timeout
+    in_file, verbose, baseline, timeout = load_args()
 
     # Init timeout hanlder
-    signal.signal(signal.SIGINT, TimeoutHandler())
-    signal.signal(signal.SIGTERM, TimeoutHandler())
-    signal.signal(signal.SIGXCPU, TimeoutHandler())
-    signal.signal(signal.SIGALRM, TimeoutHandler())
-    signal.alarm(timeout)
+    timeout_handler = TimeoutHandler()
+    timeout_handler.init(timeout)
+
+    # Init timer
+    timer = init_timer()
 
     # Init solver
     origMaxVar, objvars, objcoefs, constraints = load_input(in_file)

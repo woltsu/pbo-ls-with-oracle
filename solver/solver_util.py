@@ -1,5 +1,7 @@
 import os
 from numpy.random import choice
+from time import time
+import argparse
 
 
 def weighted_shuffle(arr, weights):
@@ -114,3 +116,40 @@ def load_input(in_file):
     objcoefs = list(map(int, objectiveline[0::2]))
 
     return origMaxVar, objvars, objcoefs, constraints
+
+
+def load_args():
+    parser = argparse.ArgumentParser(
+        description='PBO-#oracle solver', formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('instance', help='instance file name')
+    parser.add_argument('--timeout', type=int, default=60,
+                        help='Timeout after given seconds')
+    parser.add_argument('--verbose', action='store_true',
+                        help='Print debug info')
+    parser.add_argument('--baseline', action='store_true',
+                        help='Run without any semantics')
+    args = parser.parse_args()
+
+    print("c PBO-#ihs")
+    for k, v in args.__dict__.items():
+        if k in ["instance"]:
+            continue
+        print("c {}: {}".format(k, v))
+    print("c ---------------------------------\n")
+
+    in_file = args.instance
+    verbose = args.verbose
+    baseline = args.baseline
+    timeout = args.timeout
+
+    return in_file, verbose, baseline, timeout
+
+
+def init_timer():
+    start = time()
+
+    def time_print(*out):
+        print("c {:8.3f}s - {}".format(time() -
+                                       start, " ".join(list(map(str, out)))))
+
+    return time_print
