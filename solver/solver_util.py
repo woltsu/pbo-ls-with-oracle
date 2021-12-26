@@ -131,7 +131,7 @@ def load_args():
                         help='Run without any semantics')
     args = parser.parse_args()
 
-    print("c PBO-#ihs")
+    print("c PBO-#with-oracle")
     for k, v in args.__dict__.items():
         if k in ["instance"]:
             continue
