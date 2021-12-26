@@ -95,7 +95,7 @@ def solve_inc(model, T, C_map):
 
     if not is_sat(result):
         print("r UNSAT")
-        exit(1)
+        exit(0)
 
     best_model = copy.copy(result[1])
     best_cost = cost(T, best_model, C_map)
