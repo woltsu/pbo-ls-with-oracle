@@ -5,7 +5,7 @@ import copy
 import random
 import numpy as np
 from solver_util import weighted_shuffle, cost, is_good, is_sat, calculate_weights, split_to_good_and_bad, load_input, load_args, init_timer
-
+from sanity_check import check
 
 # Global variables
 SEED = 42
@@ -15,6 +15,7 @@ C_map = {}
 betterments = 0
 verbose = False
 baseline = False
+constraints = None
 timer = None
 
 
@@ -23,7 +24,11 @@ class TimeoutHandler:
     SIGINT = False
 
     def handle_exit(self, signo, frame):
-        timer(cost(T, best_model, C_map))
+        if (check(model=best_model, constraints=constraints)):
+            timer(cost(T, best_model, C_map))
+        else:
+            print("UNSAT")
+
         self.SIGINT = True
         sys.exit()
 
@@ -140,7 +145,6 @@ if __name__ == "__main__":
 
     for idx, c in enumerate(constraints):
         rsat.addConstraint(c[0], c[1])
-        constraints[idx] = (c[0], c[1])
 
     # Init data structures
     T = objvars

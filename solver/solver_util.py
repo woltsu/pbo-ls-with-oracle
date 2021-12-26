@@ -95,6 +95,7 @@ def load_input(in_file):
             else:
                 lines.append(l)
                 sides = l[:-1].split("=")
+                # Only assumes normalized instances?
                 equality = sides[0][-1] != ">"
                 rhs = int(sides[1][:-1])
                 wrds = sides[0].split()
