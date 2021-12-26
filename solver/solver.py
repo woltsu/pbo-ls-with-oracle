@@ -24,12 +24,13 @@ class TimeoutHandler:
     SIGINT = False
 
     def handle_exit(self, signo, frame):
+        self.SIGINT = True
         if (check(model=best_model, constraints=constraints)):
             timer(cost(T, best_model, C_map))
+            print("r SAT")
         else:
-            print("UNSAT")
+            print("r UNSAT")
 
-        self.SIGINT = True
         sys.exit()
 
     def init(self, timeout):
@@ -93,7 +94,7 @@ def solve_inc(model, T, C_map):
     weights = calculate_weights(T, C_map)
 
     if not is_sat(result):
-        print("UNSAT")
+        print("r UNSAT")
         exit(1)
 
     best_model = copy.copy(result[1])

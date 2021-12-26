@@ -150,7 +150,7 @@ def init_timer():
     start = time()
 
     def time_print(*out):
-        print("c {:8.3f}s - {}".format(time() -
-                                       start, " ".join(list(map(str, out)))))
+        print("t {:.3f}s - {}".format(time() -
+                                      start, " ".join(list(map(str, out)))))
 
     return time_print
