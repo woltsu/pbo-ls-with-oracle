@@ -99,10 +99,10 @@ def parse_instance(nbvar, objvars, objcoefs, constraints):
 
     print("c ----------- HARD CONSTRAINTS -----------")
     for coefs, degree in constraints:
-        """ v = " ".join(f"{abs(c)} {var if c > 0 else -var}" for var,
-                     c in coefs.items()) """
-        v = " ".join(f"{c} {var}" for var,
-                    c in coefs.items())
+        v = " ".join(f"{abs(c)} {var if c > 0 else -var}" for var,
+                     c in coefs.items())
+        """ v = " ".join(f"{c} {var}" for var,
+                    c in coefs.items()) """
         print(f"{top} {degree} {v} 0")
 
     print("c ----------- SOFT CONSTRAINTS -----------")
