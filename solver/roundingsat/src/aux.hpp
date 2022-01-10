@@ -184,8 +184,7 @@ T max(const std::vector<T>& v) {
 
 template <typename T>
 T abs(const T& x) {
-  if (x >= 0) return x;
-  return -x;
+  return std::abs(x);
 }
 template <>
 inline bigint abs(const bigint& x) {
@@ -260,7 +259,7 @@ inline unsigned msb(const int256& x) {
 
 template <typename T>
 T pow(const T& x, unsigned y) {
-  return std::powf(x, y);
+  return std::pow(x, y);
 }
 template <>
 inline bigint pow(const bigint& x, unsigned y) {
