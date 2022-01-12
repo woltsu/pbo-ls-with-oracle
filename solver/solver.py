@@ -15,6 +15,7 @@ C_map = {}
 betterments = 0
 verbose = False
 baseline = False
+print_solution = False
 constraints = None
 timer = None
 
@@ -28,6 +29,8 @@ class TimeoutHandler:
         if (check(model=best_model, constraints=constraints)):
             timer(cost(T, best_model, C_map))
             print("r SAT")
+            if print_solution:
+                print(f"o {' '.join(map(str, best_model))}")
         else:
             print("r UNSAT")
 
@@ -130,7 +133,7 @@ if __name__ == "__main__":
     np.random.seed(SEED)
 
     # Load arguments
-    in_file, verbose, baseline, timeout = load_args()
+    in_file, verbose, baseline, timeout, print_solution = load_args()
 
     # Init timeout hanlder
     timeout_handler = TimeoutHandler()
