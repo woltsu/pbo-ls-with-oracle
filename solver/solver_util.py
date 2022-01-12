@@ -129,6 +129,8 @@ def load_args():
                         help='Print debug info')
     parser.add_argument('--baseline', action='store_true',
                         help='Run without any semantics')
+    parser.add_argument('--print-solution', action='store_true',
+                        help='Print solution if any')
     args = parser.parse_args()
 
     print("c PBO-#with-oracle")
@@ -136,14 +138,15 @@ def load_args():
         if k in ["instance"]:
             continue
         print("c {}: {}".format(k, v))
-    print("c ---------------------------------\n")
+    print("c ---------------------------------")
 
     in_file = args.instance
     verbose = args.verbose
     baseline = args.baseline
     timeout = args.timeout
+    print_solution = args.print_solution
 
-    return in_file, verbose, baseline, timeout
+    return in_file, verbose, baseline, timeout, print_solution
 
 
 def init_timer():
