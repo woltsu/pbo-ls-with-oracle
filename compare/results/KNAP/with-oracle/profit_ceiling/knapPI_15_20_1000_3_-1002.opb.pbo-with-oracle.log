@@ -1,0 +1,17 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: False
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/KNAP/profit_ceiling/knapPI_15_20_1000_3_-1002.opb
+t 0.031s - 0
+t 0.111s - -984
+t 0.247s - -999
+t 0.323s - -1005
+t 3.616s - -1011
+t 300.000s - -1011
+r SAT
+real 301.13
+user 164.75
+sys 137.93

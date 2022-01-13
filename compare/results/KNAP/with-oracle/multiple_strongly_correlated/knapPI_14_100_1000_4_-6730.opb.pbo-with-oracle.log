@@ -1,0 +1,27 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: False
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/KNAP/multiple_strongly_correlated/knapPI_14_100_1000_4_-6730.opb
+t 0.026s - 0
+t 1.201s - -3234
+t 2.149s - -4634
+t 3.027s - -5233
+t 4.777s - -5328
+t 5.643s - -5332
+t 6.514s - -5730
+t 7.372s - -5929
+t 10.870s - -6934
+t 24.686s - -7125
+t 25.536s - -7527
+t 26.374s - -8033
+t 28.056s - -8229
+t 48.850s - -8330
+t 97.512s - -9332
+t 300.000s - -9332
+r SAT
+real 301.33
+user 263.85
+sys 38.69

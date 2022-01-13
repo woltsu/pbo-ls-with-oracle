@@ -1,8 +1,0 @@
-autopep8==1.5.7
-cplex==20.1.0.1
-networkx==2.6.3
-numpy==1.21.2
-pybind11==2.5.0
-pycodestyle==2.8.0
-python-louvain==0.15
-toml==0.10.2
