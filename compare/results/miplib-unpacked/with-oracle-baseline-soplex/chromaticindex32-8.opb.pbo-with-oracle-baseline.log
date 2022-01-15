@@ -1,0 +1,13 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/chromaticindex32-8.opb
+t 0.191s - 4
+t 300.527s - 4
+r SAT
+real 301.69
+user 299.17
+sys 3.98

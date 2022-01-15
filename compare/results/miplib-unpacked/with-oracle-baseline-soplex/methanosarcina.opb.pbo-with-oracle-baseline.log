@@ -1,0 +1,14 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/methanosarcina.opb
+t 0.356s - 4348
+t 108.199s - 3243
+t 311.155s - 3243
+r SAT
+real 312.44
+user 103.29
+sys 210.59

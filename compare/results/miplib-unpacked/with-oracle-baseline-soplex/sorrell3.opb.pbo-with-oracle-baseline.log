@@ -1,0 +1,15 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/sorrell3.opb
+t 2.810s - 0
+t 4.407s - -11
+t 15.587s - -13
+t 324.987s - -13
+r SAT
+real 326.33
+user 208.94
+sys 119.00

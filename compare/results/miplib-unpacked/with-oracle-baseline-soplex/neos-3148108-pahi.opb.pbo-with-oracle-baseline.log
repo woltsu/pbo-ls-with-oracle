@@ -1,0 +1,13 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/neos-3148108-pahi.opb
+t 2.967s - 0
+t 420.727s - 0
+r SAT
+real 422.17
+user 420.75
+sys 2.73

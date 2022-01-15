@@ -1,0 +1,16 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/KNAP/weakly_correlated_span/knapPI_12_500_1000_3_-8500.opb
+t 0.031s - 0
+t 40.083s - -6912
+t 79.929s - -7041
+t 119.765s - -7325
+t 300.014s - -7325
+r SAT
+real 301.48
+user 290.47
+sys 12.47

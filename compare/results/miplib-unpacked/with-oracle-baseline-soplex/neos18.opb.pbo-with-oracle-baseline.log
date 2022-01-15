@@ -1,0 +1,15 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/neos18.opb
+t 0.220s - 22
+t 0.409s - 17
+t 1.062s - 16
+t 305.936s - 16
+r SAT
+real 307.30
+user 113.03
+sys 195.60

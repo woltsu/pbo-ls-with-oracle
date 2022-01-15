@@ -1,0 +1,13 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/f2gap40400.opb
+t 0.062s - 20772
+t 300.008s - 20772
+r SAT
+real 301.55
+user 238.20
+sys 64.55

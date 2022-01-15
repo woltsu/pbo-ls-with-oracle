@@ -1,0 +1,11 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/bnatt500.opb
+r UNSAT
+real 23.71
+user 22.45
+sys 2.95

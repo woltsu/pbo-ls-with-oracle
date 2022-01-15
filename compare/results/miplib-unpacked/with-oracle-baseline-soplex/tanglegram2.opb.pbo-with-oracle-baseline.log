@@ -1,0 +1,18 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/tanglegram2.opb
+t 0.230s - 877
+t 19.110s - 545
+t 38.304s - 541
+t 147.374s - 535
+t 278.418s - 521
+t 292.842s - 474
+t 302.996s - 474
+r SAT
+real 304.27
+user 88.08
+sys 217.72

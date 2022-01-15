@@ -1,0 +1,13 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/scpj4scip.opb
+t 2.519s - 20100
+t 305.960s - 20100
+r SAT
+real 307.28
+user 97.68
+sys 210.91

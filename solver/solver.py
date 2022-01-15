@@ -4,6 +4,7 @@ import roundingsat
 import copy
 import random
 import numpy as np
+from math import inf
 from solver_util import weighted_shuffle, cost, is_good, is_sat, calculate_weights, split_to_good_and_bad, load_input, load_args, init_timer
 from sanity_check import check
 
@@ -12,6 +13,7 @@ SEED = 42
 best_model = []
 T = []
 C_map = {}
+best_cost = inf
 betterments = 0
 verbose = False
 baseline = False
@@ -44,12 +46,36 @@ class TimeoutHandler:
         signal.alarm(timeout)
 
 
-def solve(model, T, C_map, best):
+def shuffle_literals(T, model, weights_per_l):
     global baseline
+    r = np.random.random(1)[0]
+
+    (good, bad) = split_to_good_and_bad(
+        T, C_map, model)
+
+    if baseline:
+        return random.sample(T, len(T))
+
+    if r < 0.2:
+        return good + bad
+    elif r < 0.4:
+        return bad + good
+    elif r < 0.6:
+        return random.sample(T, len(T))
+    elif r < 0.8:
+        weights = np.array([weights_per_l[l] for l in T])
+        return weighted_shuffle(T, weights / weights.sum())
+    else:
+        return T
+
+
+def solve(model, T, C_map, best, weights_per_l):
+    global best_cost
 
     best_copy = copy.copy(best)
     final_result = None
     assumptions = []
+    T_len = len(T)
 
     for i in range(len(T)):
         l = T[i]
@@ -68,12 +94,9 @@ def solve(model, T, C_map, best):
             if is_sat(tmp_result):
                 best_copy = tmp_result[1]
 
-                if not baseline:
-                    # Move good literals to front for skipping
-                    # TODO: Maybe test other way around (bad on front)
-                    (good, bad) = split_to_good_and_bad(
-                        T[i+1:], C_map, best_copy)
-                    T = T[:i+1] + good + bad
+                if i != T_len - 1:
+                    T = T[:i+1] + \
+                        shuffle_literals(T[i+1:], best_copy, weights_per_l)
 
                 assumptions = tmp_assumptions
                 final_result = copy.copy(tmp_result)
@@ -88,13 +111,13 @@ def solve(model, T, C_map, best):
 
 def solve_inc(model, T, C_map):
     global best_model
+    global best_cost
     global betterments
     global verbose
-    global baseline
 
     model.solve([], 0)
     result = model.getResult()
-    weights = calculate_weights(T, C_map)
+    weights_per_l = calculate_weights(T, C_map)
 
     if not is_sat(result):
         print("r UNSAT")
@@ -107,13 +130,8 @@ def solve_inc(model, T, C_map):
         timer(best_cost)
 
     while True and not TimeoutHandler.SIGINT:
-        r = np.random.random(1)[0]
-        if r < 0.05 or baseline:
-            shuffled_T = random.sample(T, len(T))
-        else:
-            shuffled_T = weighted_shuffle(T, weights)
-
-        tmp_best = solve(model, shuffled_T, C_map, best_model)
+        shuffled_T = shuffle_literals(T, best_model, weights_per_l)
+        tmp_best = solve(model, shuffled_T, C_map, best_model, weights_per_l)
         tmp_cost = cost(T, tmp_best, C_map)
 
         if tmp_cost < best_cost:

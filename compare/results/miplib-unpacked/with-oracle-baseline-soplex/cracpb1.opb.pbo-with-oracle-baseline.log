@@ -1,0 +1,18 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/cracpb1.opb
+t 0.139s - 133277
+t 1.445s - 77656
+t 2.681s - 68116
+t 19.314s - 54306
+t 84.020s - 52951
+t 188.416s - 50062
+t 300.096s - 50062
+r SAT
+real 301.34
+user 250.91
+sys 51.80

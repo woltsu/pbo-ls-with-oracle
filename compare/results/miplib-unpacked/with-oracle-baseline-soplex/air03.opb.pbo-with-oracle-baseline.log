@@ -1,0 +1,16 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/air03.opb
+t 0.767s - 1277798
+t 17.613s - 480776
+t 123.337s - 470380
+t 179.709s - 449582
+t 300.449s - 449582
+r SAT
+real 301.74
+user 288.22
+sys 14.82
