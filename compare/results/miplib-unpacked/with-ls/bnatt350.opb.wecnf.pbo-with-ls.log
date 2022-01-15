@@ -1,5 +1,0 @@
-timeout: the monitored command dumped core
-/var/spool/slurmd/job70633766/slurm_script: line 41: 60367 Floating point exceptiontimeout -sTERM 360 /proj/wolli/ls-pbo-source-code/LS-PBO $file 300
-real 0.39
-user 0.01
-sys 0.01
