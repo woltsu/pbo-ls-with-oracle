@@ -1,4 +1,0 @@
-/var/spool/slurmd/job70634459/slurm_script: line 41: 31614 Killed                  timeout -sTERM 360 /proj/wolli/ls-pbo-source-code/LS-PBO $file 300
-real 235.84
-user 196.91
-sys 36.23

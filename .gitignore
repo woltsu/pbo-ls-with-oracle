@@ -1,4 +1,5 @@
 roundingsat.cpython*
 python-venv
 __pycache__/
-
+results
+build
