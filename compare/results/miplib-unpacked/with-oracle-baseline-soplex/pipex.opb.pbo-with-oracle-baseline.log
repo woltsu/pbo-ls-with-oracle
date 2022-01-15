@@ -1,0 +1,19 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/pipex.opb
+t 0.043s - 843437
+t 0.207s - 836471
+t 0.352s - 827698
+t 0.564s - 823316
+t 2.895s - 820848
+t 4.561s - 816629
+t 9.905s - 788263
+t 300.007s - 788263
+r SAT
+real 301.28
+user 156.98
+sys 145.63

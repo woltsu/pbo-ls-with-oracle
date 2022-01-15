@@ -1,0 +1,17 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/reblock115.opb
+t 0.133s - 0
+t 5.574s - -247892688
+t 121.508s - -249536404
+t 177.748s - -252758764
+t 187.465s - -255450037
+t 300.979s - -255450037
+r SAT
+real 301.86
+user 280.15
+sys 23.44

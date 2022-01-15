@@ -1,0 +1,13 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/scpk4.opb
+t 2.603s - 40288
+t 312.431s - 40288
+r SAT
+real 314.04
+user 100.24
+sys 214.99

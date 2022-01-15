@@ -1,0 +1,13 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/iis-pima-cov.opb
+t 0.263s - 44
+t 301.110s - 44
+r SAT
+real 302.31
+user 85.53
+sys 218.04

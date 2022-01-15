@@ -1,0 +1,13 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/hanoi5.opb
+t 2.485s - 1931
+t 306.097s - 1931
+r SAT
+real 307.24
+user 101.27
+sys 207.52

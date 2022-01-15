@@ -1,0 +1,16 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/opm2-z6-s1.opb
+t 0.354s - 0
+t 15.082s - -2535
+t 28.628s - -3018
+t 98.603s - -3282
+t 302.617s - -3282
+r SAT
+real 303.83
+user 290.12
+sys 15.35

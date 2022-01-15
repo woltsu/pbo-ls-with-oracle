@@ -1,0 +1,15 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/harp2.opb
+t 0.059s - -4575890
+t 11.115s - -6882026
+t 42.582s - -6967166
+t 300.038s - -6967166
+r SAT
+real 301.24
+user 198.66
+sys 104.01

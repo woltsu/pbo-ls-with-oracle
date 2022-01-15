@@ -1,0 +1,19 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/bley_xl1.opb
+t 4.713s - 17020
+t 16.387s - 3425
+t 46.007s - 2515
+t 80.769s - 2455
+t 109.944s - 1605
+t 149.847s - 1550
+t 218.802s - 1395
+t 372.572s - 1395
+r SAT
+real 374.22
+user 365.77
+sys 9.45

@@ -34,19 +34,21 @@ def is_sat(result):
 # Put the literals with the heaviest weights to the front
 # TODO: Maybe test other way around
 def calculate_weights(T, C_map):
+    weights_per_l = {}
     weights = [0] * len(T)
     for (i, l) in enumerate(T):
         weights[i] = abs(C_map[l])
+        weights_per_l[l] = abs(C_map[l])
 
     # Normalize weights
     total_weights = 0
     for w in weights:
         total_weights += w
 
-    for (i, w) in enumerate(weights):
-        weights[i] = w / total_weights
+    for key in weights_per_l.keys():
+        weights_per_l[key] = weights_per_l[key] / total_weights
 
-    return weights
+    return weights_per_l
 
 
 def split_to_good_and_bad(T, C_map, model):

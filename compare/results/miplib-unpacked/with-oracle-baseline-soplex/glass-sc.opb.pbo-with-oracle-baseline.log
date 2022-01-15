@@ -1,0 +1,14 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/glass-sc.opb
+t 0.226s - 32
+t 202.924s - 31
+t 300.971s - 31
+r SAT
+real 302.08
+user 85.54
+sys 218.00

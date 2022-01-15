@@ -1,0 +1,19 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/toll-like.opb
+t 0.151s - 921
+t 9.858s - 835
+t 20.116s - 813
+t 30.548s - 806
+t 73.398s - 784
+t 93.755s - 778
+t 186.403s - 774
+t 301.162s - 774
+r SAT
+real 302.49
+user 96.22
+sys 207.62

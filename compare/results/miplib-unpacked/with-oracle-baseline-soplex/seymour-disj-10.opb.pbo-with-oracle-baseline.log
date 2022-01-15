@@ -1,0 +1,17 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/seymour-disj-10.opb
+t 0.482s - 366
+t 8.128s - 361
+t 30.386s - 360
+t 37.583s - 348
+t 264.112s - 346
+t 300.926s - 346
+r SAT
+real 302.10
+user 223.74
+sys 79.94

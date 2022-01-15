@@ -1,0 +1,13 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/graph20-80-1rand.opb
+t 1.335s - 0
+t 371.154s - 0
+r SAT
+real 372.62
+user 369.53
+sys 4.53

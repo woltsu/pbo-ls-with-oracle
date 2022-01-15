@@ -1,0 +1,21 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/KNAP/similar_weights/knapPI_9_100_1000_5_-3910.opb
+t 0.036s - 0
+t 2.711s - -1683
+t 5.420s - -1738
+t 7.990s - -1965
+t 17.800s - -2803
+t 24.587s - -3019
+t 34.609s - -3339
+t 164.071s - -3546
+t 236.396s - -3576
+t 300.003s - -3576
+r SAT
+real 301.14
+user 272.52
+sys 30.07

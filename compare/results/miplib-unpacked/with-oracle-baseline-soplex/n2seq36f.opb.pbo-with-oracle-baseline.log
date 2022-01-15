@@ -1,0 +1,17 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/n2seq36f.opb
+t 0.317s - 288800
+t 3.633s - 159600
+t 12.623s - 151400
+t 31.691s - 145600
+t 96.466s - 116800
+t 300.142s - 116800
+r SAT
+real 301.31
+user 109.88
+sys 193.01

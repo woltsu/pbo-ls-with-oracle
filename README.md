@@ -14,7 +14,7 @@ The solver is forked from [here](https://bitbucket.org/coreo-group/pbo-ihs-solve
 - Create a new Python virtual environment with `python3 -m venv python-venv`
 - Activate the environment with `source ./python-venv/bin/activate`
 - Upgrade pip with `pip3 install --upgrade pip`
-- Install requirements with `pip3 install -r ./solver/requirements.txt`
+- Install requirements with `pip3 install -r ./requirements.txt`
 
 ## Building roundingsat solver
 - Make sure to first activate the Python venv

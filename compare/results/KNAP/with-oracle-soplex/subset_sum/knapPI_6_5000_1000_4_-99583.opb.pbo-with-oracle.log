@@ -1,0 +1,13 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: False
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/KNAP/subset_sum/knapPI_6_5000_1000_4_-99583.opb
+t 0.228s - 0
+t 304.517s - 0
+r SAT
+real 305.63
+user 297.91
+sys 9.42

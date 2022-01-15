@@ -1,0 +1,13 @@
+c PBO-#with-oracle
+c timeout: 300
+c verbose: True
+c baseline: True
+c print_solution: False
+c ---------------------------------
+c solving file: /proj/wolli/pbo-instances/miplib-unpacked/cap6000.opb
+t 0.231s - -99670
+t 301.139s - -99670
+r SAT
+real 302.38
+user 299.15
+sys 4.85
