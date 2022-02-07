@@ -1,6 +1,5 @@
 import glob
 import argparse
-import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -83,6 +82,8 @@ def compare_ls_and_oracle_results(ls_results, oracle_results):
     ls_points = 0
     oracle_points = 0
     equal_points = 0
+    total_diff = 0
+    diff_n = 0
 
     ls_scores = []
     oracle_scores = []
@@ -99,6 +100,10 @@ def compare_ls_and_oracle_results(ls_results, oracle_results):
 
         if ls_score < oracle_score:
             ls_points += 1
+
+            if ls_score != float("inf") and oracle_score != float("inf"):
+                total_diff += abs(ls_score - oracle_score)
+                diff_n += 1
         elif oracle_score < ls_score:
             oracle_points += 1
             oracle_instances.append(instance)
@@ -108,7 +113,11 @@ def compare_ls_and_oracle_results(ls_results, oracle_results):
     plt.scatter(ls_scores, oracle_scores, alpha=0.5)
     # plt.show()
 
-    return ls_points, oracle_points, equal_points, oracle_instances
+    avg_diff = float("inf")
+    if diff_n != 0:
+        avg_diff = total_diff / diff_n
+
+    return ls_points, oracle_points, equal_points, oracle_instances, avg_diff
 
 
 if __name__ == "__main__":
@@ -117,11 +126,11 @@ if __name__ == "__main__":
     ls_results = parse_ls_results(path_to_ls)
     oracle_results = parse_oracle_results(path_to_oracle)
 
-    ls_points, oracle_points, equal_points, oracle_instances = compare_ls_and_oracle_results(
+    ls_points, oracle_points, equal_points, oracle_instances, avg_diff = compare_ls_and_oracle_results(
         ls_results, oracle_results)
 
     print(
-        f"ls points: {ls_points}, oracle points: {oracle_points}, equal points: {equal_points}")
+        f"ls points: {ls_points}, oracle points: {oracle_points}, equal points: {equal_points}, avg diff: {avg_diff}")
 
     if print_oracle_instances:
         for instance in oracle_instances:
