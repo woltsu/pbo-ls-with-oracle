@@ -135,7 +135,10 @@ def load_args():
                         help='Print solution if any')
     args = parser.parse_args()
 
+    seed = int(time())
+
     print("c PBO-#with-oracle")
+    print(f"c using seed {seed}")
     for k, v in args.__dict__.items():
         if k in ["instance"]:
             continue
@@ -148,7 +151,7 @@ def load_args():
     timeout = args.timeout
     print_solution = args.print_solution
 
-    return in_file, verbose, baseline, timeout, print_solution
+    return in_file, verbose, baseline, timeout, print_solution, seed
 
 
 def init_timer():
