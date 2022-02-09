@@ -4,12 +4,12 @@ import roundingsat
 import copy
 import random
 import numpy as np
+import time
 from math import inf
 from solver_util import weighted_shuffle, cost, is_good, is_sat, calculate_weights, split_to_good_and_bad, load_input, load_args, init_timer
 from sanity_check import check
 
 # Global variables
-SEED = 42
 best_model = []
 T = []
 C_map = {}
@@ -20,6 +20,8 @@ baseline = False
 print_solution = False
 constraints = None
 timer = None
+current_solver_calls = 1
+total_solver_calls = 1
 
 
 # Outputs result after given timeout
@@ -29,10 +31,12 @@ class TimeoutHandler:
     def handle_exit(self, signo, frame):
         self.SIGINT = True
         if (check(model=best_model, constraints=constraints)):
-            timer(cost(T, best_model, C_map))
+            timer(cost(T, best_model, C_map),
+                  current_solver_calls, total_solver_calls)
             print("r SAT")
             if print_solution:
-                print(f"o {' '.join(map(str, best_model))}")
+                print(
+                    f"o {' '.join(map(str, best_model))}")
         else:
             print("r UNSAT")
 
@@ -46,31 +50,25 @@ class TimeoutHandler:
         signal.alarm(timeout)
 
 
-def shuffle_literals(T, model, weights_per_l):
-    global baseline
+def shuffle_literals(T, model, weights):
     r = np.random.random(1)[0]
+    if r < 0.05:
+        return random.sample(T, len(T))
+    else:
+        return weighted_shuffle(T, weights)
 
+
+def to_good_and_bad(T, C_map, model):
     (good, bad) = split_to_good_and_bad(
         T, C_map, model)
-
-    if baseline:
-        return random.sample(T, len(T))
-
-    if r < 0.2:
-        return good + bad
-    elif r < 0.4:
-        return bad + good
-    elif r < 0.6:
-        return random.sample(T, len(T))
-    elif r < 0.8:
-        weights = np.array([weights_per_l[l] for l in T])
-        return weighted_shuffle(T, weights / weights.sum())
-    else:
-        return T
+    return good + bad
 
 
-def solve(model, T, C_map, best, weights_per_l):
+def solve(model, T, C_map, best):
     global best_cost
+    global current_solver_calls
+    global current_solver_calls
+    global total_solver_calls
 
     best_copy = copy.copy(best)
     final_result = None
@@ -89,6 +87,9 @@ def solve(model, T, C_map, best, weights_per_l):
             tmp_assumptions = copy.copy(assumptions)
             tmp_assumptions.append(-best_copy[l_idx])
             model.solve(tmp_assumptions, 0)
+            current_solver_calls += 1
+            total_solver_calls += 1
+
             tmp_result = model.getResult()
 
             if is_sat(tmp_result):
@@ -96,7 +97,7 @@ def solve(model, T, C_map, best, weights_per_l):
 
                 if i != T_len - 1:
                     T = T[:i+1] + \
-                        shuffle_literals(T[i+1:], best_copy, weights_per_l)
+                        to_good_and_bad(T[i+1:], C_map, best_copy)
 
                 assumptions = tmp_assumptions
                 final_result = copy.copy(tmp_result)
@@ -114,10 +115,14 @@ def solve_inc(model, T, C_map):
     global best_cost
     global betterments
     global verbose
+    global current_solver_calls
+    global total_solver_calls
 
     model.solve([], 0)
     result = model.getResult()
     weights_per_l = calculate_weights(T, C_map)
+    weights = np.array([weights_per_l[l] for l in T])
+    weights = weights / weights.sum()
 
     if not is_sat(result):
         print("r UNSAT")
@@ -127,16 +132,18 @@ def solve_inc(model, T, C_map):
     best_cost = cost(T, best_model, C_map)
 
     if verbose:
-        timer(best_cost)
+        timer(best_cost, current_solver_calls, total_solver_calls)
 
     while True and not TimeoutHandler.SIGINT:
-        shuffled_T = shuffle_literals(T, best_model, weights_per_l)
-        tmp_best = solve(model, shuffled_T, C_map, best_model, weights_per_l)
+        shuffled_T = shuffle_literals(T, best_model, weights)
+
+        tmp_best = solve(model, shuffled_T, C_map, best_model)
         tmp_cost = cost(T, tmp_best, C_map)
 
         if tmp_cost < best_cost:
             if verbose:
-                timer(tmp_cost)
+                timer(tmp_cost, current_solver_calls, total_solver_calls)
+            current_solver_calls = 0
             betterments += 1
             best_model = tmp_best
             best_cost = tmp_cost
@@ -145,13 +152,12 @@ def solve_inc(model, T, C_map):
 
 
 if __name__ == "__main__":
-    # Seed the random generator
-    # TODO: In the future, test with different seed values and see whether it affects the results
-    random.seed(SEED)
-    np.random.seed(SEED)
-
     # Load arguments
-    in_file, verbose, baseline, timeout, print_solution = load_args()
+    in_file, verbose, baseline, timeout, print_solution, seed = load_args()
+
+    # Seed the random generator
+    random.seed(seed)
+    np.random.seed(seed)
 
     # Init timeout hanlder
     timeout_handler = TimeoutHandler()
