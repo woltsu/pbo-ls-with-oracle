@@ -31,7 +31,9 @@ def find_log_files(path):
 
 
 def parse_instance_name(path):
-    return path.split(".")[0].split("/")[-1]
+    family = path.split(".")[0].split("/")[-2]
+    name = path.split(".")[0].split("/")[-1]
+    return family, name
 
 
 def parse_ls_results(path_to_ls):
@@ -39,14 +41,13 @@ def parse_ls_results(path_to_ls):
     ls_log_files = find_log_files(path_to_ls)
 
     for log_file in ls_log_files:
-        instance_name = parse_instance_name(log_file)
+        instance_family, instance_name = parse_instance_name(log_file)
         results[instance_name] = {}
 
         with open(log_file) as log:
-            data = log.readlines()
-            score = data[0].split("\t")[0]
-
             try:
+                data = log.readlines()
+                score = data[0].split("\t")[0]
                 results[instance_name]["score"] = int(score)
             except:
                 # No feasible solution
@@ -60,14 +61,14 @@ def parse_oracle_results(path_to_oracle):
     oracle_log_files = find_log_files(path_to_oracle)
 
     for log_file in oracle_log_files:
-        instance_name = parse_instance_name(log_file)
+        instance_family, instance_name = parse_instance_name(log_file)
         results[instance_name] = {}
 
         with open(log_file) as log:
             data = log.readlines()
             for l in reversed(data):
                 if l[0] == "t":
-                    score = int(l.split(" - ")[-1])
+                    score = int(l.split(" - ")[-1].split(" ")[0])
                     results[instance_name]["score"] = int(score)
                     break
 
@@ -84,13 +85,18 @@ def compare_ls_and_oracle_results(ls_results, oracle_results):
     equal_points = 0
     total_diff = 0
     diff_n = 0
+    missing = 0
 
     ls_scores = []
     oracle_scores = []
     oracle_instances = []
 
     for instance, ls_result in ls_results.items():
-        oracle_result = oracle_results[instance]
+        if instance in oracle_results:
+            oracle_result = oracle_results[instance]
+        else:
+            missing += 1
+            continue
 
         ls_score = ls_result["score"]
         oracle_score = oracle_result["score"]
@@ -117,7 +123,7 @@ def compare_ls_and_oracle_results(ls_results, oracle_results):
     if diff_n != 0:
         avg_diff = total_diff / diff_n
 
-    return ls_points, oracle_points, equal_points, oracle_instances, avg_diff
+    return ls_points, oracle_points, equal_points, oracle_instances, avg_diff, missing
 
 
 if __name__ == "__main__":
@@ -126,8 +132,10 @@ if __name__ == "__main__":
     ls_results = parse_ls_results(path_to_ls)
     oracle_results = parse_oracle_results(path_to_oracle)
 
-    ls_points, oracle_points, equal_points, oracle_instances, avg_diff = compare_ls_and_oracle_results(
+    ls_points, oracle_points, equal_points, oracle_instances, avg_diff, missing = compare_ls_and_oracle_results(
         ls_results, oracle_results)
+
+    print(f"missing: {missing}")
 
     print(
         f"ls points: {ls_points}, oracle points: {oracle_points}, equal points: {equal_points}, avg diff: {avg_diff}")

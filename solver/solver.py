@@ -4,7 +4,7 @@ import roundingsat
 import copy
 import random
 import numpy as np
-import time
+from time import time
 from math import inf
 from solver_util import weighted_shuffle, cost, is_good, is_sat, calculate_weights, split_to_good_and_bad, load_input, load_args, init_timer
 from sanity_check import check
@@ -14,7 +14,7 @@ best_model = []
 T = []
 C_map = {}
 best_cost = inf
-betterments = 0
+betterments = 1
 verbose = False
 baseline = False
 print_solution = False
@@ -22,6 +22,7 @@ constraints = None
 timer = None
 current_solver_calls = 1
 total_solver_calls = 1
+total_time = 0
 
 
 # Outputs result after given timeout
@@ -32,7 +33,8 @@ class TimeoutHandler:
         self.SIGINT = True
         if (check(model=best_model, constraints=constraints)):
             timer(cost(T, best_model, C_map),
-                  current_solver_calls, total_solver_calls)
+                  current_solver_calls, total_solver_calls, betterments)
+            print(f"T {total_time / total_solver_calls}")
             print("r SAT")
             if print_solution:
                 print(
@@ -64,6 +66,13 @@ def to_good_and_bad(T, C_map, model):
     return good + bad
 
 
+def model_solve(model, *args):
+    global total_time
+    start = time() * 1000
+    model.solve(*args)
+    total_time += (time() * 1000) - start
+
+
 def solve(model, T, C_map, best):
     global best_cost
     global current_solver_calls
@@ -86,7 +95,7 @@ def solve(model, T, C_map, best):
             # Solve with new assumption
             tmp_assumptions = copy.copy(assumptions)
             tmp_assumptions.append(-best_copy[l_idx])
-            model.solve(tmp_assumptions, 0)
+            model_solve(model, tmp_assumptions, 0)
             current_solver_calls += 1
             total_solver_calls += 1
 
@@ -118,7 +127,7 @@ def solve_inc(model, T, C_map):
     global current_solver_calls
     global total_solver_calls
 
-    model.solve([], 0)
+    model_solve(model, [], 0)
     result = model.getResult()
     weights_per_l = calculate_weights(T, C_map)
     weights = np.array([weights_per_l[l] for l in T])
@@ -132,7 +141,7 @@ def solve_inc(model, T, C_map):
     best_cost = cost(T, best_model, C_map)
 
     if verbose:
-        timer(best_cost, current_solver_calls, total_solver_calls)
+        timer(best_cost, current_solver_calls, total_solver_calls, betterments)
 
     while True and not TimeoutHandler.SIGINT:
         shuffled_T = shuffle_literals(T, best_model, weights)
@@ -141,10 +150,10 @@ def solve_inc(model, T, C_map):
         tmp_cost = cost(T, tmp_best, C_map)
 
         if tmp_cost < best_cost:
-            if verbose:
-                timer(tmp_cost, current_solver_calls, total_solver_calls)
-            current_solver_calls = 0
             betterments += 1
+            if verbose:
+                timer(tmp_cost, current_solver_calls, total_solver_calls, betterments)
+            current_solver_calls = 0
             best_model = tmp_best
             best_cost = tmp_cost
 
@@ -170,6 +179,14 @@ if __name__ == "__main__":
     origMaxVar, objvars, objcoefs, constraints = load_input(in_file)
     rsat = roundingsat.Roundingsat()
     rsat.init(origMaxVar)
+
+    M = 0
+    for c in objcoefs:
+        if c < 0:
+            M += c
+
+    print(f"M {M}")
+    print(f"S {origMaxVar - 1} {len(constraints)}")
 
     for idx, c in enumerate(constraints):
         rsat.addConstraint(c[0], c[1])
