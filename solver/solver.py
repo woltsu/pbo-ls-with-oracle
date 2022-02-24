@@ -4,7 +4,7 @@ import roundingsat
 import copy
 import random
 import numpy as np
-from time import time
+from time import time_ns
 from math import inf
 from solver_util import weighted_shuffle, cost, is_good, is_sat, calculate_weights, split_to_good_and_bad, load_input, load_args, init_timer
 from sanity_check import check
@@ -68,9 +68,9 @@ def to_good_and_bad(T, C_map, model):
 
 def model_solve(model, *args):
     global total_time
-    start = time() * 1000
+    start = time_ns() // 1000000
     model.solve(*args)
-    total_time += (time() * 1000) - start
+    total_time += (time_ns() // 1000000) - start
 
 
 def solve(model, T, C_map, best):
@@ -152,7 +152,8 @@ def solve_inc(model, T, C_map):
         if tmp_cost < best_cost:
             betterments += 1
             if verbose:
-                timer(tmp_cost, current_solver_calls, total_solver_calls, betterments)
+                timer(tmp_cost, current_solver_calls,
+                      total_solver_calls, betterments)
             current_solver_calls = 0
             best_model = tmp_best
             best_cost = tmp_cost
