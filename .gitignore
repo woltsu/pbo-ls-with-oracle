@@ -4,3 +4,5 @@ results*
 __pycache__
 build
 plots
+observations
+instances

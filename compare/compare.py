@@ -194,7 +194,7 @@ def compare_ls_and_oracle_results(ls_results, oracle_results):
         results[domain]["ls_score"] += score_ls
 
     df = pd.DataFrame(
-        columns=["domain", "#instances", "#wins", "#equal", "#calls", "#betterments", "score", "score (ls)", "solve time (ms)", "median solve time (ms)"], index=domains)
+        columns=["domain", "#instances", "#solved", "#wins", "#equal", "#calls", "#betterments", "score", "score (ls)", "solve time (ms)", "median solve time (ms)"], index=domains)
 
     meta = pd.DataFrame(
         columns=["domain", "average number of variables",
@@ -215,6 +215,7 @@ def compare_ls_and_oracle_results(ls_results, oracle_results):
         df.loc[domain, "#wins"] = results[domain]["wins"]
         df.loc[domain, "#equal"] = results[domain]["equal"]
         df.loc[domain, "#instances"] = results[domain]["instances"]
+        df.loc[domain, "#solved"] = results[domain]["solved"]
         df.loc[domain, "score"] = results[domain]["score"] / n_instances
         df.loc[domain,
                "score (ls)"] = results[domain]["ls_score"] / n_instances
@@ -223,9 +224,9 @@ def compare_ls_and_oracle_results(ls_results, oracle_results):
         df.loc[domain, "#betterments"] = results[domain]["solver_betterments"] / \
             n_solved_instances
         df.loc[domain,
-               "solve time (ms)"] = results[domain]["solver_time"] / n_solved_instances
+               "solve time (ms)"] = (results[domain]["solver_time"] / n_solved_instances) / 1000
         df.loc[domain, "median solve time (ms)"] = np.median(
-            np.array(results[domain]["solver_times"]))
+            np.array(results[domain]["solver_times"])) / 1000
 
         scatter_x.append(df.loc[domain, "score"])
         scatter_y.append(df.loc[domain, "score (ls)"])
@@ -240,7 +241,7 @@ def compare_ls_and_oracle_results(ls_results, oracle_results):
 
     highlighted = df[abs(df["score"] - df["score (ls)"]) > 0.1]
     highlighted = highlighted.style.highlight_max(
-        axis=1, props='bfseries: ;', subset=highlighted.columns[6:8])
+        axis=1, props='bfseries: ;', subset=highlighted.columns[7:9])
     highlighted = highlighted.format(precision=2)
     highlighted = highlighted.hide_index()
     highlighted = highlighted.format(
@@ -248,18 +249,18 @@ def compare_ls_and_oracle_results(ls_results, oracle_results):
     print(highlighted.to_latex())
 
     df = df.style.highlight_max(
-        axis=1, props='bfseries: ;', subset=highlighted.columns[6:8])
+        axis=1, props='bfseries: ;', subset=highlighted.columns[7:9])
     df = df.format(precision=2)
     df = df.hide_index()
     df = df.format("\\textbf{{{}}}", escape="latex",
                    subset=highlighted.columns[0:1])
     print(df.to_latex())
 
-    meta = meta.style.format(precision=0)
+    """ meta = meta.style.format(precision=0)
     meta = meta.hide_index()
     meta = meta.format("\\textbf{{{}}}", escape="latex",
                        subset=highlighted.columns[0:1])
-    print(meta.to_latex())
+    print(meta.to_latex()) """
 
     graph_data = {
         "scatter_x": scatter_x,
