@@ -129,6 +129,7 @@ def compare_ls_and_oracle_results(ls_results, oracle_results):
     # TODO: #solver calls made
     # TODO: %solver calls with betterments
     results = {}
+    all_solver_betterments = {}
 
     for instance, ls_result in ls_results.items():
         if instance in oracle_results:
@@ -164,6 +165,10 @@ def compare_ls_and_oracle_results(ls_results, oracle_results):
 
         results[domain]["solver_calls"] += oracle_result["n_calls"]
         results[domain]["solver_betterments"] += oracle_result["n_betterments"]
+
+        if not oracle_result["n_betterments"] in all_solver_betterments:
+            all_solver_betterments[oracle_result["n_betterments"]] = 0
+        all_solver_betterments[oracle_result["n_betterments"]] += 1
 
         M = oracle_result["M"]
         ls_score = ls_result["score"] + M
@@ -267,6 +272,20 @@ def compare_ls_and_oracle_results(ls_results, oracle_results):
         "scatter_y": scatter_y
     }
 
+    betterments = pd.DataFrame(
+        columns=["number of betterments", "count"], index=all_solver_betterments.keys()
+    )
+
+    m = max(all_solver_betterments.keys())
+    for i in range(m + 1):
+        if i in all_solver_betterments:
+            betterments.loc[i, "number of betterments"] = i
+            betterments.loc[i, "count"] =  all_solver_betterments[i]
+
+    betterments = betterments.sort_index()
+    betterments = betterments.style.hide_index()
+    print(betterments.to_latex())
+
     return ls_points, oracle_points, equal_points, oracle_instances, missing, graph_data
 
 
@@ -301,15 +320,15 @@ def lines(oracle_results):
         if "n_vars" in data and "n_cons" in data:
             # create a list with two empty handles (or more if needed)
             handles = [mpl_patches.Rectangle((0, 0), 1, 1, fc="white", ec="white",
-                                            lw=0, alpha=0)] * 2
+                                             lw=0, alpha=0)] * 2
 
             # create the corresponding number of labels (= the text you want to display)
             labels = []
             labels.append(f"No. variables = {data['n_vars']}")
             labels.append(f"No. constraints = {data['n_cons']}")
             plt.legend(handles, labels, loc='best', fontsize='small',
-                    fancybox=True, framealpha=0.7,
-                    handlelength=0, handletextpad=0)
+                       fancybox=True, framealpha=0.7,
+                       handlelength=0, handletextpad=0)
 
         plt.savefig(f"{results_dir}/{instance}")
         plt.close()
@@ -322,7 +341,7 @@ if __name__ == "__main__":
     oracle_results = parse_oracle_results(path_to_oracle)
     ls_results = parse_ls_results(path_to_ls)
 
-    lines(oracle_results)
+    # lines(oracle_results)
 
     ls_points, oracle_points, equal_points, oracle_instances, missing, graph_data = compare_ls_and_oracle_results(
         ls_results, oracle_results)
