@@ -4,6 +4,9 @@ import roundingsat
 import copy
 import random
 import numpy as np
+import multiprocessing
+from multiprocessing.pool import ThreadPool as Pool
+
 from time import time_ns
 from math import inf
 from solver_util import weighted_shuffle, cost, is_good, is_sat, calculate_weights, split_to_good_and_bad, load_input, load_args, init_timer
@@ -23,6 +26,8 @@ timer = None
 current_solver_calls = 1
 total_solver_calls = 1
 total_time = 0
+model_test = None
+p = Pool(1)
 
 
 # Outputs result after given timeout
@@ -30,6 +35,10 @@ class TimeoutHandler:
     SIGINT = False
 
     def handle_exit(self, signo, frame):
+        global p
+
+        p.close()
+        p.join()
         self.SIGINT = True
         if (check(model=best_model, constraints=constraints)):
             timer(cost(T, best_model, C_map),
@@ -78,6 +87,8 @@ def solve(model, T, C_map, best):
     global current_solver_calls
     global current_solver_calls
     global total_solver_calls
+    global model_test
+    global p
 
     best_copy = copy.copy(best)
     final_result = None
@@ -95,13 +106,21 @@ def solve(model, T, C_map, best):
             # Solve with new assumption
             tmp_assumptions = copy.copy(assumptions)
             tmp_assumptions.append(-best_copy[l_idx])
-            model_solve(model, tmp_assumptions, 0)
+            res = p.apply_async(model_solve, (model, tmp_assumptions, 0))
+
+            sat = False
+
+            try:
+                res.get(timeout=5)
+                tmp_result = model.getResult()
+                sat = is_sat(tmp_result)
+            except multiprocessing.TimeoutError:
+                pass
+
             current_solver_calls += 1
             total_solver_calls += 1
 
-            tmp_result = model.getResult()
-
-            if is_sat(tmp_result):
+            if sat:
                 best_copy = tmp_result[1]
 
                 if i != T_len - 1:
@@ -180,6 +199,7 @@ if __name__ == "__main__":
     origMaxVar, objvars, objcoefs, constraints = load_input(in_file)
     rsat = roundingsat.Roundingsat()
     rsat.init(origMaxVar)
+    model_test = rsat
 
     M = 0
     for c in objcoefs:
